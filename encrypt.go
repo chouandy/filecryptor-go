@@ -4,10 +4,10 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"os"
 	"strings"
 
 	"github.com/chouandy/goex/cryptoex"
+	"github.com/chouandy/goex/dotenvex"
 )
 
 // EncryptCommand the command struct
@@ -45,8 +45,10 @@ func (c *EncryptCommand) Run(args []string) int {
 		return 1
 	}
 
-	// Get options from env
-	c.GetOptionsFromEnv()
+	// Get password from env or awa parameter store
+	if len(c.Password) == 0 {
+		c.Password = dotenvex.GetSecretsPassword()
+	}
 
 	// Validate Options
 	fmt.Print("Validate Options...")
@@ -67,13 +69,6 @@ func (c *EncryptCommand) Run(args []string) int {
 	fmt.Println("done")
 
 	return 0
-}
-
-// GetOptionsFromEnv get options from env
-func (c *EncryptCommand) GetOptionsFromEnv() {
-	if len(c.Password) == 0 {
-		c.Password = os.Getenv("SECRETS_PASSWORD")
-	}
 }
 
 // ValidateOptions validate options

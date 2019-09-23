@@ -10,7 +10,7 @@ go get -u github.com/chouandy/filecryptor
 
 ## Usage
 
-The password can be ENV["SECRETS_PASSWORD"]
+The password can be ENV["SECRETS_PASSWORD"] or ENV["SECRETS_PASSWORD_PS_NAME"] + ENV["SECRETS_PASSWORD_PS_REGION"]
 
 - Encrypt File
 
