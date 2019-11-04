@@ -20,6 +20,9 @@ func main() {
 		"dec": func() (cli.Command, error) {
 			return &DecryptCommand{}, nil
 		},
+		"hex": func() (cli.Command, error) {
+			return &HexCommand{}, nil
+		},
 	}
 	// Run cli
 	exitStatus, err := c.Run()

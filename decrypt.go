@@ -4,6 +4,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/chouandy/goex/cryptoex"
@@ -14,6 +15,8 @@ import (
 type DecryptCommand struct {
 	File     string
 	Password string
+	PSName   string
+	PSRegion string
 }
 
 // Synopsis the synopsis of command
@@ -30,6 +33,8 @@ Usage: filecryptor dec
 Options:
   --file         Target file to be decrypted.
   --password     The password for decrypt. It can be ENV["SECRETS_PASSWORD"]
+  --ps-name      The parameter store name for decrypt. It can be ENV["SECRETS_PASSWORD_PS_NAME"]
+  --ps-region    The parameter store region for decrypt. It can be ENV["SECRETS_PASSWORD_PS_REGION"]
 `
 	return strings.TrimSpace(helpText)
 }
@@ -40,9 +45,16 @@ func (c *DecryptCommand) Run(args []string) int {
 	f := flag.NewFlagSet("dec", flag.ContinueOnError)
 	f.StringVar(&c.File, "file", "", "file")
 	f.StringVar(&c.Password, "password", "", "password")
+	f.StringVar(&c.PSName, "ps-name", "", "ps-name")
+	f.StringVar(&c.PSRegion, "ps-region", "us-east-1", "ps-region")
 	if err := f.Parse(args); err != nil {
 		fmt.Println(err)
 		return 1
+	}
+
+	if len(c.PSName) > 0 {
+		os.Setenv("SECRETS_PASSWORD_PS_NAME", c.PSName)
+		os.Setenv("SECRETS_PASSWORD_PS_REGION", c.PSRegion)
 	}
 
 	// Get password from env or awa parameter store
