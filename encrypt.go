@@ -7,8 +7,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/chouandy/goex/cryptoex"
-	"github.com/chouandy/goex/dotenvex"
+	"github.com/chouandy/go-sdk/crypto"
+	"github.com/chouandy/go-sdk/dotenv"
 )
 
 // EncryptCommand the command struct
@@ -59,7 +59,7 @@ func (c *EncryptCommand) Run(args []string) int {
 
 	// Get password from env or awa parameter store
 	if len(c.Password) == 0 {
-		c.Password = dotenvex.GetSecretsPassword()
+		c.Password = dotenv.GetSecretsPassword()
 	}
 
 	// Validate Options
@@ -74,7 +74,7 @@ func (c *EncryptCommand) Run(args []string) int {
 	fmt.Printf("Encrypt File...")
 	src := c.File
 	dst := c.File + ".enc"
-	if err := cryptoex.FileEncrypter(src, dst, []byte(c.Password)); err != nil {
+	if err := crypto.FileEncrypter(src, dst, []byte(c.Password)); err != nil {
 		fmt.Println(err)
 		return 1
 	}

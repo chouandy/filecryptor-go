@@ -5,7 +5,7 @@ File Cryptor is a tool for encrypting, and decrypting file.
 ## Install
 
 ``` sh
-go get -u github.com/chouandy/filecryptor
+go install github.com/chouandy/filecryptor
 ```
 
 ## Usage
