@@ -1,12 +1,11 @@
 package main
 
 import (
+	"crypto/rand"
 	"encoding/hex"
 	"flag"
 	"fmt"
-	"math/rand"
 	"strings"
-	"time"
 )
 
 // HexCommand the command struct
@@ -22,11 +21,11 @@ func (c *HexCommand) Synopsis() string {
 // Help the help of command
 func (c *HexCommand) Help() string {
 	helpText := `
-Usage: filecryptor pass
-	Random hex string
+Usage: filecryptor hex
+	Random hex string from a cryptographically secure source, fit for passwords
 
 Options:
-	-n           The size of hex.
+	-n           Number of random bytes, printed as twice as many hex characters. Default 16.
 `
 	return strings.TrimSpace(helpText)
 }
@@ -40,17 +39,17 @@ func (c *HexCommand) Run(args []string) int {
 		fmt.Println(err)
 		return 1
 	}
+	if c.N < 1 {
+		fmt.Println("n must be at least 1")
+		return 1
+	}
 
-	// New random hex
-	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 	b := make([]byte, c.N)
-	r.Read(b)
-
-	// Hex encode
-	enc := make([]byte, len(b)*2)
-	hex.Encode(enc, b)
-
-	fmt.Println(string(enc))
+	if _, err := rand.Read(b); err != nil {
+		fmt.Println(err)
+		return 1
+	}
+	fmt.Println(hex.EncodeToString(b))
 
 	return 0
 }

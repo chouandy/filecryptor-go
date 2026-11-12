@@ -5,10 +5,8 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
-
-	"github.com/chouandy/go-sdk/crypto"
-	"github.com/chouandy/go-sdk/dotenv"
 )
 
 // DecryptCommand the command struct
@@ -31,7 +29,7 @@ Usage: filecryptor dec
 	Decrypt file
 
 Options:
-  --file         Target file to be decrypted.
+  --file         Encrypted file ending in .enc. The plaintext goes to the same path without .enc.
   --password     The password for decrypt. It can be ENV["SECRETS_PASSWORD"]
   --ps-name      The parameter store name for decrypt. It can be ENV["SECRETS_PASSWORD_PS_NAME"]
   --ps-region    The parameter store region for decrypt. It can be ENV["SECRETS_PASSWORD_PS_REGION"]
@@ -59,7 +57,7 @@ func (c *DecryptCommand) Run(args []string) int {
 
 	// Get password from env or awa parameter store
 	if len(c.Password) == 0 {
-		c.Password = dotenv.GetSecretsPassword()
+		c.Password = getSecretsPassword()
 	}
 
 	// Validate Options
@@ -73,8 +71,8 @@ func (c *DecryptCommand) Run(args []string) int {
 	// Decrypt File
 	fmt.Printf("Decrypt File...")
 	src := c.File
-	dst := strings.Replace(c.File, ".enc", "", -1)
-	if err := crypto.FileDecrypter(src, dst, []byte(c.Password)); err != nil {
+	dst := strings.TrimSuffix(c.File, ".enc")
+	if err := decryptFile(src, dst, []byte(c.Password)); err != nil {
 		fmt.Println(err.Error())
 		return 1
 	}
@@ -87,6 +85,9 @@ func (c *DecryptCommand) Run(args []string) int {
 func (c *DecryptCommand) ValidateOptions() error {
 	if len(c.File) == 0 {
 		return errors.New("file can't be blank")
+	}
+	if !strings.HasSuffix(c.File, ".enc") || filepath.Base(c.File) == ".enc" {
+		return errors.New("file must end in .enc: the plaintext is written to that name without it")
 	}
 	if len(c.Password) == 0 {
 		return errors.New("password can't be blank")
